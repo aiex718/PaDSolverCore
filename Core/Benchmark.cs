@@ -17,6 +17,7 @@ namespace PaDSolver.Core
         {
             public string SolverName {get;set;}
             public int RoundCount { get; set; }
+            public double AvgScore { get; set; }
             public double AvgTimeMs { get; set; }
             public double AvgSteps { get; set; }
             public double AvgIterationPerRoute { get; set; }
@@ -25,6 +26,7 @@ namespace PaDSolver.Core
             public void Print()
             {
                 Console.WriteLine($"{SolverName} Benchmark {RoundCount} times finish");
+                Console.WriteLine($"Avg Score {AvgScore}");
                 Console.WriteLine($"Avg TimeMs usage {AvgTimeMs}");
                 Console.WriteLine($"Avg Iteration per route {AvgIterationPerRoute}");
                 Console.WriteLine($"Avg Steps per route {AvgSteps}");
@@ -37,8 +39,8 @@ namespace PaDSolver.Core
         public int RoundCount { get; set; }
         List<Route> Routes { get; set; }
 
-        int BeadTypes { get; set; } = 6;
-        int TargetScore { get; set; } = 6000;
+        public int BeadTypes { get; set; } = 6;
+        public int TargetScore { get; set; } = 6000;
 
         SolverFactory Factory;
 
@@ -83,6 +85,7 @@ namespace PaDSolver.Core
             {
                 SolverName=Factory.solverName,
                 RoundCount = this.RoundCount,
+                AvgScore = Routes.Select(x=>x.Score).Average(),
                 AvgTimeMs = Routes.Select(x => x.TimeComsumedMs).Average(),
                 AvgIterationPerRoute= Routes.Select(x => x.Iteration).Average(),
                 AvgSteps= Routes.Select(x => x.Directions.Count).Average(),

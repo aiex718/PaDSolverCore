@@ -10,5 +10,6 @@ namespace PaDSolver.Model.Solver
     {
         Task<Route> SolveBoard(Board board);
         int ThreadCount{get;set;}
+        bool EnableScoreDrop{get;set;}
     }
 }

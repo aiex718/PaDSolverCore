@@ -20,14 +20,16 @@ namespace PaDSolver
             var BruteResult = await( new Benchmark( new SolverFactory(nameof(BruteSolver))){ 
                 RoundCount=100,
                 ThreadCount=6,
-                Rand=new Random(rndSeed)
+                Rand=new Random(rndSeed),
+                TargetScore=6000
             }.Start());
             BruteResult.Print();
 
             var PatternResult = await( new Benchmark( new SolverFactory(nameof(PatternSolver))){ 
                 RoundCount=100,
                 ThreadCount=6,
-                Rand=new Random(rndSeed)
+                Rand=new Random(rndSeed),                
+                TargetScore=6000
             }.Start());
             PatternResult.Print();
             

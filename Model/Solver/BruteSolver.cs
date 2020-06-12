@@ -18,6 +18,10 @@ namespace PaDSolver.Model.Solver
 
         string[] AvailableDir,BackwardDir;
 
+        public bool EnableScoreDrop {get;set;}=true;
+        public int ScoreDropSpeed {get;set;}=-150;
+        public int TargetScore;
+
         public async Task<Route> SolveBoard(Board board)
         {
             if (ThreadCount<1)
@@ -32,6 +36,9 @@ namespace PaDSolver.Model.Solver
                 new string[] { "U", "D", "L", "R" } : new string[] { "U", "D", "L", "R", "LU", "LD", "RU", "RD" };
             BackwardDir = board.MoveDirection == 4 ?
                 new string[] { "D", "U", "R", "L" } : new string[] { "D", "U", "R", "L", "RD", "RU", "LD", "LU" };
+    
+            TargetScore=board.TargetScore;
+            ScoreDropSpeed = Math.Min(ScoreDropSpeed,0);
 
             timer.Elapsed += Timer_Elapsed;
             timer.Enabled = true;
@@ -68,6 +75,8 @@ namespace PaDSolver.Model.Solver
         {
             Console.WriteLine($"{(Attempts- LastAttemptsGet) / (timer.Interval/1000)} tries per second");
             LastAttemptsGet = Attempts;
+            if(EnableScoreDrop)
+                Interlocked.Add(ref TargetScore,ScoreDropSpeed);
         }
 
 
@@ -130,12 +139,14 @@ namespace PaDSolver.Model.Solver
 
                         Score = eval.EvalBoard(TempBoard.Clone());
 
-                        if (Score >= board.TargetScore)
+                        if (Score >= TargetScore)
                             break;
                     }
 
-                } while (Score < board.TargetScore);
-                Console.WriteLine("Finish in " + Attempts.ToString());
+                } while (Score < TargetScore);
+                Console.WriteLine($"Finish in {Attempts.ToString()}");
+                Console.WriteLine($"TargetScore {TargetScore.ToString()},Final Score {Score.ToString()}");
+
 
                 Result.Score = Score;
                 Result.Result = TempBoard.Beads;

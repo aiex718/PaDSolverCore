@@ -19,10 +19,14 @@ namespace PaDSolver.Model.Solver
         System.Timers.Timer timer = new System.Timers.Timer(1000);
         public int ThreadCount{get;set;}=1;
         
-        public int AllowScoreDrop{get;set;}=0;
+        public int AllowPathScoreDrop{get;set;}=0;
         string[] AvailableDir;
         Dictionary<string,string> BackwardDirDict;
 
+        int TargetScore;
+        public int ScoreDropSpeed {get;set;}=-150;
+
+        public bool EnableScoreDrop {get;set;}=true;
         public async Task<Route> SolveBoard(Board board)
         {
             if (ThreadCount<1)
@@ -41,9 +45,12 @@ namespace PaDSolver.Model.Solver
                 {"RD","LU"},{"RU","LD"},{"LD","RU"},{"LU","RD"}
             };
 
+            TargetScore=board.TargetScore;
+            ScoreDropSpeed = Math.Min(ScoreDropSpeed,0);
+
             timer.Elapsed += Timer_Elapsed;
             timer.Enabled = true;
-
+            
             //seperate points for multi thread
             var SeperatedStartPoints = new List<List<Point>>();
                 for (int i = 0; i < ThreadCount; i++)
@@ -86,6 +93,8 @@ namespace PaDSolver.Model.Solver
         {
             Console.WriteLine($"{(Attempts- LastAttemptsGet) / (timer.Interval/1000)} tries per second");
             LastAttemptsGet = Attempts;
+            if(EnableScoreDrop)
+                Interlocked.Add(ref TargetScore,ScoreDropSpeed);
         }
 
 
@@ -152,7 +161,7 @@ namespace PaDSolver.Model.Solver
                         }
                         //Select Max score direction
                         int MaxScore = DirToScore.Values.Max();
-                        var AcceptableScores = DirToScore.Where(x => x.Value >= MaxScore-AllowScoreDrop);
+                        var AcceptableScores = DirToScore.Where(x => x.Value >= MaxScore-AllowPathScoreDrop);
                         var SelectScoreDirKvp = AcceptableScores.ElementAt(rand.Next(AcceptableScores.Count()));
                         var MaxScoreDir = SelectScoreDirKvp.Key;
                         CurrentScore=SelectScoreDirKvp.Value;
@@ -165,12 +174,13 @@ namespace PaDSolver.Model.Solver
                             LastTraveledPath.RemoveAt(0);
                         //Console.WriteLine(TempBoard.Dump());
 
-                        if (CurrentScore >= board.TargetScore)
+                        if (CurrentScore >= TargetScore)
                             break;
                     }
 
-                } while (CurrentScore < board.TargetScore);
-                Console.WriteLine("Finish in " + Attempts.ToString());
+                } while (CurrentScore < TargetScore);
+                Console.WriteLine($"Finish in {Attempts.ToString()}");
+                Console.WriteLine($"TargetScore {TargetScore.ToString()},Final Score {CurrentScore.ToString()}");
 
                 Result.Score = CurrentScore;
                 Result.Result = TempBoard.Beads;
