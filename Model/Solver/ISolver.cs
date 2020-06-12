@@ -8,7 +8,7 @@ namespace PaDSolver.Model.Solver
 {
     interface ISolver
     {
-        Route SolveBoard(Board board);
+        Task<Route> SolveBoard(Board board);
         int ThreadCount{get;set;}
     }
 }

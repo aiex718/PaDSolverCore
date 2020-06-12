@@ -16,9 +16,9 @@ namespace PaDSolver.Model.Solver
         System.Timers.Timer timer = new System.Timers.Timer(1000);
         public int ThreadCount{get;set;}=1;
 
-        //ConcurrentDictionary<Point,ConcurrentBag<string>> TriedPaths;
+        string[] AvailableDir,BackwardDir;
 
-        public Route SolveBoard(Board board)
+        public async Task<Route> SolveBoard(Board board)
         {
             if (ThreadCount<1)
                 ThreadCount=1;
@@ -27,6 +27,11 @@ namespace PaDSolver.Model.Solver
 
             var tokenSource = new CancellationTokenSource();
             CancellationToken ct = tokenSource.Token;
+
+            AvailableDir = board.MoveDirection == 4 ?
+                new string[] { "U", "D", "L", "R" } : new string[] { "U", "D", "L", "R", "LU", "LD", "RU", "RD" };
+            BackwardDir = board.MoveDirection == 4 ?
+                new string[] { "D", "U", "R", "L" } : new string[] { "D", "U", "R", "L", "RD", "RU", "LD", "LU" };
 
             timer.Elapsed += Timer_Elapsed;
             timer.Enabled = true;
@@ -40,7 +45,7 @@ namespace PaDSolver.Model.Solver
                 t.Start();
             }
 
-            Task.WhenAny(Tasks).Wait();
+            await Task.WhenAny(Tasks);
             tokenSource.Cancel();
             timer.Enabled = false;
 
@@ -71,14 +76,11 @@ namespace PaDSolver.Model.Solver
             Random rand = new Random(Guid.NewGuid().GetHashCode());
             List<string> Directions = new List<string>();
 
-            string[] AvailableDir = board.MoveDirection == 4 ?
-                new string[] { "U", "D", "L", "R" } : new string[] { "U", "D", "L", "R", "LU", "LD", "RU", "RD" };
-            string[] BackwardDir = board.MoveDirection == 4 ?
-                new string[] { "D", "U", "R", "L" } : new string[] { "D", "U", "R", "L", "RD", "RU", "LD", "LU" };
-
             int Score = 0;
             Route Result = new Route();
             Board TempBoard = null;
+
+            IBoardEvaluator eval = new ComboEvaluator() { PerScore = 1000 };
 
             int PickX = board.SelectStartX;
             int PickY = board.SelectStartY;
@@ -87,12 +89,11 @@ namespace PaDSolver.Model.Solver
             {
                 do
                 {
-                    ct.ThrowIfCancellationRequested();
                     Interlocked.Increment(ref Attempts);
 
                     Directions.Clear();
 
-                    Point StartPoint = new Point(PickX, PickY);
+                    Point CurrentPoint = new Point(PickX, PickY);
                     if (++PickX >= board.SelectEndX)
                     {
                         PickX = 0;
@@ -100,15 +101,14 @@ namespace PaDSolver.Model.Solver
                             PickY = 0;
                     }
 
-                    Result.StartX = StartPoint.X;
-                    Result.StartY = StartPoint.Y;
+                    Result.StartX = CurrentPoint.X;
+                    Result.StartY = CurrentPoint.Y;
 
                     TempBoard = board.Clone();
 
-                    IBoardEvaluator eval = new ComboEval() { Score = 1000 };
-
                     for (int i = 0; i < board.StepLimit; i++)
                     {
+                        ct.ThrowIfCancellationRequested();
                         int DirRnd = rand.Next(AvailableDir.Length);
                         var dir = AvailableDir[DirRnd];
                         var BackDir = BackwardDir[DirRnd];
@@ -118,13 +118,13 @@ namespace PaDSolver.Model.Solver
                             continue;//don't select backward path
                         }
 
-                        var NextPoint = TempBoard.MoveBeads(StartPoint, dir);
-                        if (StartPoint == NextPoint)//MoveFail
+                        var NextPoint = TempBoard.MoveBeads(CurrentPoint, dir);
+                        if (CurrentPoint == NextPoint)//MoveFail
                         {
                             --i;
                             continue;
                         }
-                        StartPoint = NextPoint;
+                        CurrentPoint = NextPoint;
 
                         Directions.Add(dir);
 
@@ -143,7 +143,7 @@ namespace PaDSolver.Model.Solver
 
                 return Result;
             }
-            catch (OperationCanceledException e)
+            catch (OperationCanceledException)
             {
                 //Console.WriteLine($"Cancelled Task Id:{Thread.CurrentThread.ManagedThreadId}");
             }

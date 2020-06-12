@@ -15,7 +15,7 @@ namespace PaDSolver.Model
         public int Width { get; set; }
         public int Height { get; set; }
         public List<int> Beads { get; set; }
-        public List<int> BeadsWeight { get; set; }
+        public List<float> Weights { get; set; }
         public int SelectStartX { get; set; }
         public int SelectEndX { get; set; }
         public int SelectStartY { get; set; }
@@ -25,7 +25,19 @@ namespace PaDSolver.Model
         public int TargetScore { get; set; }
 
         public int Length => Width * Height;
-        public int BeadTypesCount => BeadsWeight.Count;
+        public int BeadTypesCount => Weights.Count;
+
+        public bool HasWeight {
+            get
+            {
+                if(_HasWeight.HasValue)
+                    return _HasWeight.Value;
+                else
+                    _HasWeight=Weights.Distinct().Count()>1;
+                return _HasWeight.Value;
+            }
+        }
+        bool? _HasWeight=null;
 
         public int[,] Get2DBeads()
         {
@@ -46,13 +58,13 @@ namespace PaDSolver.Model
                         
             Width = w;
             Height = h;
-            BeadsWeight = new List<int>();
+            Weights = new List<float>();
             Beads = new List<int>();
 
             for (int i = 0; i < BeadTypes; i++)
-                BeadsWeight.Add(1);
+                Weights.Add(1);
 
-            IBoardEvaluator eval = new ComboEval() { Score = 1000 };
+            IBoardEvaluator eval = new ComboEvaluator();
 
             do
             {
@@ -105,7 +117,7 @@ namespace PaDSolver.Model
         {
             Board b = this.MemberwiseClone() as Board;
             b.Beads = this.Beads.ToList();
-            b.BeadsWeight = this.BeadsWeight.ToList();
+            b.Weights = this.Weights.ToList();
 
             return b;
         }

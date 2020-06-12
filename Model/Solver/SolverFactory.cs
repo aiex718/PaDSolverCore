@@ -6,15 +6,9 @@ using System.Threading.Tasks;
 
 namespace PaDSolver.Model.Solver
 {
-    interface ISolverFactory
+    class SolverFactory 
     {
-        ISolver GenSolver();
-    }
-
-
-    class SolverFactory : ISolverFactory
-    {
-        string solverName;
+        public string solverName {get; set;}
         public SolverFactory (string SolverName)
         {
             solverName = SolverName;
@@ -26,6 +20,8 @@ namespace PaDSolver.Model.Solver
             {
                 case(nameof(BruteSolver)):
                     return new BruteSolver();
+                case(nameof(PatternSolver)):
+                    return new PatternSolver();
             }
 
             return null;

@@ -15,6 +15,7 @@ namespace PaDSolver.Core
     {
         public class Result
         {
+            public string SolverName {get;set;}
             public int RoundCount { get; set; }
             public double AvgTimeMs { get; set; }
             public double AvgSteps { get; set; }
@@ -23,7 +24,7 @@ namespace PaDSolver.Core
 
             public void Print()
             {
-                Console.WriteLine($"Benchmark {RoundCount} times finish");
+                Console.WriteLine($"{SolverName} Benchmark {RoundCount} times finish");
                 Console.WriteLine($"Avg TimeMs usage {AvgTimeMs}");
                 Console.WriteLine($"Avg Iteration per route {AvgIterationPerRoute}");
                 Console.WriteLine($"Avg Steps per route {AvgSteps}");
@@ -39,16 +40,16 @@ namespace PaDSolver.Core
         int BeadTypes { get; set; } = 6;
         int TargetScore { get; set; } = 6000;
 
-        ISolverFactory Factory;
+        SolverFactory Factory;
 
 
-        public Benchmark(ISolverFactory solverFactory)
+        public Benchmark(SolverFactory solverFactory)
         {
             Factory = solverFactory;
         }
 
 
-        public Result Start()
+        public async Task<Result> Start()
         {
             Routes = new List<Route>();
             for (int i = 0; i < RoundCount; i++)
@@ -64,22 +65,23 @@ namespace PaDSolver.Core
                 b.MoveDirection = 4;
                 b.TargetScore = TargetScore;
 
-                Console.WriteLine("Generated Board");
-                //Console.WriteLine(b.ToString());
-                Console.WriteLine(b.Dump());
+                //Console.WriteLine("Generated Board");
+                ////Console.WriteLine(b.ToString());
+                //Console.WriteLine(b.Dump());
 
                 var solver = Factory.GenSolver();
                 solver.ThreadCount=this.ThreadCount;
-                var route = solver.SolveBoard(b);
+                var route = await solver.SolveBoard(b);
 
                 Console.WriteLine(route.ToString());
-                Console.WriteLine(route.Result.Dump(b.Width));
+                //Console.WriteLine(route.Result.Dump(b.Width));
 
                 Routes.Add(route);
             }
 
             return new Result()
             {
+                SolverName=Factory.solverName,
                 RoundCount = this.RoundCount,
                 AvgTimeMs = Routes.Select(x => x.TimeComsumedMs).Average(),
                 AvgIterationPerRoute= Routes.Select(x => x.Iteration).Average(),
