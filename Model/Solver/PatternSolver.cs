@@ -12,7 +12,7 @@ using PaDSolver.Model.Pattern;
 
 namespace PaDSolver.Model.Solver
 {
-    class PatternSolver : ISolver
+    class LinkSolver : ISolver
     {
         const int BannedLastTraveledPointCount=3;
         int Attempts = 0;

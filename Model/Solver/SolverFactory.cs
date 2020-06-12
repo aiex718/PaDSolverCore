@@ -18,10 +18,10 @@ namespace PaDSolver.Model.Solver
         {
             switch (solverName)
             {
-                case(nameof(BruteSolver)):
-                    return new BruteSolver();
-                case(nameof(PatternSolver)):
-                    return new PatternSolver();
+                case(nameof(RandomSolver)):
+                    return new RandomSolver();
+                case(nameof(LinkSolver)):
+                    return new LinkSolver();
             }
 
             return null;

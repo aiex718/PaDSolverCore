@@ -67,9 +67,9 @@ namespace PaDSolver.Core
                 b.MoveDirection = 4;
                 b.TargetScore = TargetScore;
 
-                //Console.WriteLine("Generated Board");
-                ////Console.WriteLine(b.ToString());
-                //Console.WriteLine(b.Dump());
+                Console.WriteLine("Generated Board");
+                //Console.WriteLine(b.ToString());
+                Console.WriteLine(b.Dump());
 
                 var solver = Factory.GenSolver();
                 solver.ThreadCount=this.ThreadCount;

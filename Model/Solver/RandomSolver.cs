@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace PaDSolver.Model.Solver
 {
-    class BruteSolver : ISolver
+    class RandomSolver : ISolver
     {
         int Attempts = 0;
         System.Timers.Timer timer = new System.Timers.Timer(1000);
