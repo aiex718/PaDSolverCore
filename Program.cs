@@ -26,10 +26,10 @@ namespace PaDSolver
         static void Main(string[] args)
         {
             Console.Write("Input port:");
-            //var port = Convert.ToInt32(Console.ReadLine());
+            var port = Convert.ToInt32(Console.ReadLine());
 
             var host = new WebHostBuilder()
-                .UseKestrel(options => {options.Listen(new IPAddress(0), 5000);})
+                .UseKestrel(options => {options.Listen(new IPAddress(0), port);})
                 //.UseContentRoot(Directory.GetCurrentDirectory())
                 .UseStartup<Startup>()
                 .Build();
