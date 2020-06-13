@@ -20,11 +20,12 @@ namespace PaDSolver.Model.Solver
             {
                 case(nameof(RandomSolver)):
                     return new RandomSolver();
+                case(nameof(Conn2Solver)):
+                    return new Conn2Solver();
                 case(nameof(LinkSolver)):
                     return new LinkSolver();
             }
-
-            return null;
+            throw new KeyNotFoundException(solverName+" Not Found");
         }
     }
 

@@ -19,14 +19,13 @@ namespace PaDSolver.Model.Solver
         System.Timers.Timer timer = new System.Timers.Timer(1000);
         public int ThreadCount{get;set;}=1;
         
-        public int AllowPathScoreDrop{get;set;}=0;
+        public int AllowPathScoreDrop{get;set;}=10;
         string[] AvailableDir;
         Dictionary<string,string> BackwardDirDict;
 
         int TargetScore;
-        public int ScoreDropSpeed {get;set;}=-150;
-
-        public bool EnableScoreDrop {get;set;}=true;
+        public int ScoreDropPerSec {get;set;}
+        public bool EnableScoreDrop {get;set;}
         public async Task<Route> SolveBoard(Board board)
         {
             if (ThreadCount<1)
@@ -46,7 +45,7 @@ namespace PaDSolver.Model.Solver
             };
 
             TargetScore=board.TargetScore;
-            ScoreDropSpeed = Math.Min(ScoreDropSpeed,0);
+            ScoreDropPerSec = Math.Max(ScoreDropPerSec,0);
 
             timer.Elapsed += Timer_Elapsed;
             timer.Enabled = true;
@@ -94,7 +93,7 @@ namespace PaDSolver.Model.Solver
             Console.WriteLine($"{(Attempts- LastAttemptsGet) / (timer.Interval/1000)} tries per second");
             LastAttemptsGet = Attempts;
             if(EnableScoreDrop)
-                Interlocked.Add(ref TargetScore,ScoreDropSpeed);
+                Interlocked.Add(ref TargetScore,ScoreDropPerSec*-1);
         }
 
 
@@ -131,6 +130,29 @@ namespace PaDSolver.Model.Solver
                         new ComboEvaluator() { PerScore = 1000 },
                         new Hori2Pattern(){ PerScore=10},
                         new Vert2Pattern(){ PerScore=10},
+
+                        new ArrowUPattern(){PerScore=10},
+                        new ArrowDPattern(){PerScore=10},
+                        new ArrowLPattern(){PerScore=10},
+                        new ArrowRPattern(){PerScore=10},
+
+                        new BowULPattern(){PerScore=10},
+                        new BowURPattern(){PerScore=10},
+                        new BowDLPattern(){PerScore=10},
+                        new BowDRPattern(){PerScore=10},
+                        new BowRDPattern(){PerScore=10},
+                        new BowRUPattern(){PerScore=10},
+                        new BowLDPattern(){PerScore=10},
+                        new BowLUPattern(){PerScore=10},
+                        
+                        new LGapDLPattern(){PerScore=5},
+                        new LGapURPattern(){PerScore=5},
+                        new LGapDLPattern(){PerScore=5},
+                        new LGapDRPattern(){PerScore=5},
+                        new LGapRDPattern(){PerScore=5},
+                        new LGapRUPattern(){PerScore=5},
+                        new LGapLDPattern(){PerScore=5},
+                        new LGapLUPattern(){PerScore=5},
 
                         // new Hori4Pattern(){ PerScore=-10},
                         // new Hori4Pattern(){ PerScore=-10},

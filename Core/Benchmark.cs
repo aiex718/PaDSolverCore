@@ -39,11 +39,13 @@ namespace PaDSolver.Core
         public int RoundCount { get; set; }
         List<Route> Routes { get; set; }
 
-        public int BeadTypes { get; set; } = 6;
-        public int TargetScore { get; set; } = 6000;
+        public int BeadTypes { get; set; }
+        public int TargetScore { get; set; }
+
+        public bool EnableScoreDrop { get; set; }
+        public int ScoreDropPerSec { get; set; }
 
         SolverFactory Factory;
-
 
         public Benchmark(SolverFactory solverFactory)
         {
@@ -67,15 +69,17 @@ namespace PaDSolver.Core
                 b.MoveDirection = 4;
                 b.TargetScore = TargetScore;
 
-                Console.WriteLine("Generated Board");
+                //Console.WriteLine("Generated Board");
                 //Console.WriteLine(b.ToString());
-                Console.WriteLine(b.Dump());
+                //Console.WriteLine(b.Dump());
 
                 var solver = Factory.GenSolver();
                 solver.ThreadCount=this.ThreadCount;
+                solver.EnableScoreDrop = this.EnableScoreDrop;
+                solver.ScoreDropPerSec = this.ScoreDropPerSec;
                 var route = await solver.SolveBoard(b);
 
-                Console.WriteLine(route.ToString());
+                //Console.WriteLine(route.ToString());
                 //Console.WriteLine(route.Result.Dump(b.Width));
 
                 Routes.Add(route);

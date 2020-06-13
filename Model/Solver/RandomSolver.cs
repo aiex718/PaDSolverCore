@@ -18,8 +18,8 @@ namespace PaDSolver.Model.Solver
 
         string[] AvailableDir,BackwardDir;
 
-        public bool EnableScoreDrop {get;set;}=true;
-        public int ScoreDropSpeed {get;set;}=-150;
+        public bool EnableScoreDrop {get;set;}
+        public int ScoreDropPerSec {get;set;}
         public int TargetScore;
 
         public async Task<Route> SolveBoard(Board board)
@@ -38,7 +38,7 @@ namespace PaDSolver.Model.Solver
                 new string[] { "D", "U", "R", "L" } : new string[] { "D", "U", "R", "L", "RD", "RU", "LD", "LU" };
     
             TargetScore=board.TargetScore;
-            ScoreDropSpeed = Math.Min(ScoreDropSpeed,0);
+            ScoreDropPerSec = Math.Max(ScoreDropPerSec,0);
 
             timer.Elapsed += Timer_Elapsed;
             timer.Enabled = true;
@@ -76,7 +76,7 @@ namespace PaDSolver.Model.Solver
             Console.WriteLine($"{(Attempts- LastAttemptsGet) / (timer.Interval/1000)} tries per second");
             LastAttemptsGet = Attempts;
             if(EnableScoreDrop)
-                Interlocked.Add(ref TargetScore,ScoreDropSpeed);
+                Interlocked.Add(ref TargetScore,ScoreDropPerSec*-1);
         }
 
 

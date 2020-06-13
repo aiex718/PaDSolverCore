@@ -22,7 +22,7 @@ namespace PaDSolver.Model
         public int SelectEndY { get; set; }
         public int StepLimit { get; set; }
         public int MoveDirection { get; set; }
-        public int TargetScore;
+        public int TargetScore { get; set; }
 
         public int Length => Width * Height;
         public int BeadTypesCount => Weights.Count;
