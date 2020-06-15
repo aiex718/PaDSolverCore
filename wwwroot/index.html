@@ -1,0 +1,142 @@
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <style>
+            /* Split the screen in half */
+            .split {
+                height: 100%;
+                width: 50%;
+                position: fixed;
+                z-index: 1;
+                top: 0;
+                overflow-x: hidden;
+                padding-top: 20px;
+            }
+            
+            /* Control the left side */
+            .left {
+                left: 0;
+                background-color: rgb(38, 151, 226);
+            }
+            
+            /* Control the right side */
+            .right {
+                right: 0;
+                background-color: rgb(0, 255, 136);
+            }
+            
+            /* If you want the content centered horizontally and vertically */
+            .centered {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                text-align: center;
+            }
+        </style>
+
+        <script type="text/javascript">
+            var board;
+            var route;
+            
+            function GetBoard()
+            {
+                var w = document.getElementById("bwidth").value;
+                var h = document.getElementById("bheight").value;
+                var t = document.getElementById("btypes").value;
+                var url = window.location.href+"api/board/gen?w="+w+"&h="+h+"&t="+t;
+
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.open( "GET", url, true );
+                xmlHttp.onreadystatechange = function() {
+                    if (xmlHttp.readyState == 4) 
+                    {
+                        board = JSON.parse(xmlHttp.responseText);
+                        var rndboardview = document.getElementById("rndboardview");
+                        rndboardview.value = board.Beads;
+                        rndboardview.cols=w*2-1;
+                        rndboardview.rows=h;
+                        document.getElementById("steps").value = board.StepLimit;
+                        document.getElementById("tscore").value = board.TargetScore;
+                        document.getElementById("weights").value = board.Weights;
+                    }
+                }
+                xmlHttp.send( null );                
+            }
+
+            function SolveBoard()
+            {
+                board.StepLimit = parseInt(document.getElementById("steps").value);
+                board.TargetScore = parseInt(document.getElementById("tscore").value);                
+                board.MoveDirection = parseInt(document.getElementById("directions").value);
+
+                var json = JSON.stringify(board);
+                var url = window.location.href+"api/solve?solvername=LinkSolver";
+
+                var request = new XMLHttpRequest();
+                request.open('POST', url,true);
+                request.setRequestHeader('Content-Type', 'application/json');
+                request.onreadystatechange = function() {
+                    if (request.readyState == 4) 
+                    {
+                        var w = document.getElementById("bwidth").value;
+                        var h = document.getElementById("bheight").value;
+
+                        document.getElementById("routeiew").value=request.responseText;
+                        var route = JSON.parse(request.responseText);
+                        
+                        var solvedboardview = document.getElementById("solvedboardview");                
+                        solvedboardview.value=route.Result;
+                        solvedboardview.cols=w*2-1;
+                        solvedboardview.rows=h;
+
+                        document.getElementById("rscore").innerHTML =route.Score;
+                    }
+                }
+                request.send(json);
+            }
+        </script>
+    </head>
+
+<body>
+
+    <div class="split left">
+        <div class="centered">
+            <label for="bwidth">Board Width</label>
+            <input type="text" id="bwidth" name="bwidth" value="6"><br><br>
+            <label for="bheight">Board Height</label>
+            <input type="text" id="bheight" name="bheight" value="5"><br><br>
+            <label for="btypes">Bead Types</label>
+            <input type="text" id="btypes" name="btypes" value="6"><br><br>
+            <button onclick="GetBoard()">Get Random Board</button><br><br>
+            <textarea name="rndboardview" id="rndboardview" cols="10" rows="6" style="margin-top: 20px;"></textarea><br><br>
+            <label for="tscore">Target Score</label>
+            <input type="text" id="tscore" name="tscore"><br><br>
+            <label for="steps">Step Limit</label>
+            <input type="text" id="steps" name="steps" ><br><br>
+            <label for="weights">Weights</label>
+            <input type="text" id="weights" name="weights"><br><br>
+            <label for="directions">Directions</label>
+            <select name="directions" id="directions">
+                <option value="4">4</option>
+                <option value="8">8</option>
+            </select><br><br>
+            <button onclick="SolveBoard()">Solve Board</button><br><br>
+
+        </div>
+      </div>
+      
+      <div class="split right">
+        <div class="centered">
+            <textarea name="routeiew" id="routeiew" cols="40" rows="20"></textarea><br><br>
+            <textarea name="solvedboardview" id="solvedboardview" cols="10" rows="6" style="margin-top: 20px;"></textarea><br><br>
+            <label >Score</label>
+            <label name="rscore" id="rscore">0</label>
+        </div>
+      </div>
+
+</body>
+
+
+</html>

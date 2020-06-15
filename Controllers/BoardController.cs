@@ -27,7 +27,24 @@ namespace PaDSolver.Controllers
             b.SelectEndY = b.Height;
             b.StepLimit = 40;
             b.MoveDirection = 4;
-            b.TargetScore = 6000;
+            b.TargetScore = 6500;
+
+            return JsonConvert.SerializeObject(b);
+        }
+
+        [HttpGet]
+        [Route("api/board/gen")]
+        public ActionResult<string> GetWH([FromQuery]int w,[FromQuery]int h,[FromQuery]int t)
+        {
+            Board b = new Board();
+            b.Random(w, h, t);
+            b.SelectStartX = 0;
+            b.SelectEndX = b.Width;
+            b.SelectStartY = 0;
+            b.SelectEndY = b.Height;
+            b.StepLimit = 40;
+            b.MoveDirection = 4;
+            b.TargetScore = 6500;
 
             return JsonConvert.SerializeObject(b);
         }

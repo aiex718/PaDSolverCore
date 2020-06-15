@@ -26,11 +26,11 @@ namespace PaDSolver
         static void Main(string[] args)
         {
             Console.Write("Input port:");
-            var port = Convert.ToInt32(Console.ReadLine());
-
+            var port = Convert.ToInt32(Console.ReadLine());//5000            
+            
             var host = new WebHostBuilder()
                 .UseKestrel(options => {options.Listen(new IPAddress(0), port);})
-                //.UseContentRoot(Directory.GetCurrentDirectory())
+                .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseStartup<Startup>()
                 .Build();
 
@@ -52,6 +52,7 @@ namespace PaDSolver
             // }.Start());
             // Result.Print();
         }
+
     }
 
     public class Startup
@@ -74,6 +75,9 @@ namespace PaDSolver
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
 
             app.UseHttpsRedirection();
             app.UseRouting();
