@@ -34,10 +34,12 @@ namespace PaDSolver.Model.Pattern
                             if (Pattern[ph, pw] != 0)
                             {
                                 var NewBead = board.GetBead(w + pw, h + ph);
-                                    if (FoundBead==null)
-                                        FoundBead = NewBead;
-                                    else if(FoundBead != NewBead)
-                                        Continue=false;
+                                if(NewBead<0)
+                                    Continue=false;
+                                else if (FoundBead==null)
+                                    FoundBead = NewBead;
+                                else if(FoundBead != NewBead)
+                                    Continue=false;
                             }
                         }
                     }

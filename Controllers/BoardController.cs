@@ -27,7 +27,7 @@ namespace PaDSolver.Controllers
             b.SelectEndY = b.Height;
             b.StepLimit = 40;
             b.MoveDirection = 4;
-            b.TargetScore = 6500;
+            b.TargetScore = 6000;
 
             return JsonConvert.SerializeObject(b);
         }
@@ -44,7 +44,7 @@ namespace PaDSolver.Controllers
             b.SelectEndY = b.Height;
             b.StepLimit = 40;
             b.MoveDirection = 4;
-            b.TargetScore = 6500;
+            b.TargetScore = 6000;
 
             return JsonConvert.SerializeObject(b);
         }

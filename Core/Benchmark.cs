@@ -67,8 +67,10 @@ namespace PaDSolver.Core
                 b.SelectEndY = b.Height;
                 b.StepLimit = 40;
                 b.MoveDirection = 4;
-                b.TargetScore = TargetScore;
-
+                if(TargetScore>0)
+                    b.TargetScore = TargetScore;
+                else
+                    b.SetMaxTargetScore();
                 //Console.WriteLine("Generated Board");
                 //Console.WriteLine(b.ToString());
                 //Console.WriteLine(b.Dump());

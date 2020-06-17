@@ -16,6 +16,8 @@ namespace PaDSolver.Model.BoardScoreEval
         {
             int ScoreResult = 0;
 
+            //board = board.Clone();
+
             bool Continue=true;
             do
             {

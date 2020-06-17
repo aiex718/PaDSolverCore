@@ -37,19 +37,19 @@ namespace PaDSolver
             host.Run();
 
             // int Round=1000;
-            // int ThreadSet=8;
+            // int ThreadSet=6;
             // bool EnScoreDrop=false;
             // int rndSeed=12345678;//12345678//Guid.NewGuid().GetHashCode();
 
-            // var Result = await( new Benchmark( new SolverFactory(nameof(RandomSolver))){ 
+            // var Result = ( new Benchmark( new SolverFactory(nameof(LinkSolver))){ 
             //     RoundCount=Round,
             //     ThreadCount=ThreadSet,
             //     Rand=new Random(rndSeed),                
             //     TargetScore=6000,
             //     BeadTypes=6,
             //     EnableScoreDrop=EnScoreDrop,
-            //     ScoreDropPerSec=150
-            // }.Start());
+            //     ScoreDropPerSec=300
+            // }.Start()).Result;
             // Result.Print();
         }
 

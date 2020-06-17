@@ -14,12 +14,11 @@ namespace PaDSolver.Model.Solver
 {
     class LinkSolver : ISolver
     {
-        const int BannedLastTraveledPointCount=3;
         int Attempts = 0;
         System.Timers.Timer timer = new System.Timers.Timer(1000);
         public int ThreadCount{get;set;}=1;
         
-        public int AllowPathScoreDrop{get;set;}=5;
+        public int AllowPathScoreDrop{get;set;}=10;
         string[] AvailableDir;
         Dictionary<string,string> BackwardDirDict;
 
@@ -123,36 +122,36 @@ namespace PaDSolver.Model.Solver
                     Result.StartX = CurrentPoint.X;
                     Result.StartY = CurrentPoint.Y;
 
-                    List<Point>LastTraveledPath = new List<Point>();
                     TempBoard = board.Clone();
 
                     IBoardEvaluator eval = new EvaluatorCollection {
                         new ComboEvaluator() { PerScore = 1000 },
-                        new Hori2Pattern(){ PerScore=5},
-                        new Vert2Pattern(){ PerScore=5},
 
-                        new ArrowUPattern(){PerScore=5},
-                        new ArrowDPattern(){PerScore=5},
-                        new ArrowLPattern(){PerScore=5},
-                        new ArrowRPattern(){PerScore=5},
+                        new Hori2Pattern(){ PerScore=10},
+                        new Vert2Pattern(){ PerScore=10},
 
-                        new BowULPattern(){PerScore=5},
-                        new BowURPattern(){PerScore=5},
-                        new BowDLPattern(){PerScore=5},
-                        new BowDRPattern(){PerScore=5},
-                        new BowRDPattern(){PerScore=5},
-                        new BowRUPattern(){PerScore=5},
-                        new BowLDPattern(){PerScore=5},
-                        new BowLUPattern(){PerScore=5},
+                        new ArrowUPattern(){PerScore=10},
+                        new ArrowDPattern(){PerScore=10},
+                        new ArrowLPattern(){PerScore=10},
+                        new ArrowRPattern(){PerScore=10},
+
+                        new BowULPattern(){PerScore=10},
+                        new BowURPattern(){PerScore=10},
+                        new BowDLPattern(){PerScore=10},
+                        new BowDRPattern(){PerScore=10},
+                        new BowRDPattern(){PerScore=10},
+                        new BowRUPattern(){PerScore=10},
+                        new BowLDPattern(){PerScore=10},
+                        new BowLUPattern(){PerScore=10},
                         
-                        new LGapDLPattern(){PerScore=2},
-                        new LGapURPattern(){PerScore=2},
-                        new LGapDLPattern(){PerScore=2},
-                        new LGapDRPattern(){PerScore=2},
-                        new LGapRDPattern(){PerScore=2},
-                        new LGapRUPattern(){PerScore=2},
-                        new LGapLDPattern(){PerScore=2},
-                        new LGapLUPattern(){PerScore=2},
+                        //new LGapDLPattern(){PerScore=5},
+                        //new LGapURPattern(){PerScore=5},
+                        //new LGapDLPattern(){PerScore=5},
+                        //new LGapDRPattern(){PerScore=5},
+                        //new LGapRDPattern(){PerScore=5},
+                        //new LGapRUPattern(){PerScore=5},
+                        //new LGapLDPattern(){PerScore=5},
+                        //new LGapLUPattern(){PerScore=5},
 
                         // new Hori4Pattern(){ PerScore=-10},
                         // new Hori4Pattern(){ PerScore=-10},
@@ -175,8 +174,6 @@ namespace PaDSolver.Model.Solver
                             Point NextPoint=DirBoard.MoveBeads(CurrentPoint, dir);
                             if (CurrentPoint == NextPoint)
                                 continue;//MoveFail
-                            if (LastTraveledPath.Contains(NextPoint))
-                                continue;//prevent infinite loop
 
                             int DirScore = eval.EvalBoard(DirBoard);
                             DirToScore.Add(dir,DirScore);
@@ -190,10 +187,6 @@ namespace PaDSolver.Model.Solver
 
                         Directions.Add(MaxScoreDir);
                         CurrentPoint = TempBoard.MoveBeads(CurrentPoint,MaxScoreDir);
-                        LastTraveledPath.Add(CurrentPoint);
-
-                        while (LastTraveledPath.Count>BannedLastTraveledPointCount)
-                            LastTraveledPath.RemoveAt(0);
                         //Console.WriteLine(TempBoard.Dump());
 
                         if (CurrentScore >= TargetScore)
@@ -201,8 +194,10 @@ namespace PaDSolver.Model.Solver
                     }
 
                 } while (CurrentScore < TargetScore);
+
+                var ev = new ComboEvaluator() { PerScore = 1000 };
                 Console.WriteLine($"Finish in {Attempts.ToString()}");
-                Console.WriteLine($"TargetScore {TargetScore.ToString()},Final Score {CurrentScore.ToString()}");
+                Console.WriteLine($"TargetScore {TargetScore.ToString()},Score {CurrentScore.ToString()}");
 
                 Result.Score = CurrentScore;
                 Result.Result = TempBoard.Beads;

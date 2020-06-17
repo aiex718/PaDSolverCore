@@ -157,5 +157,12 @@ namespace PaDSolver.Model
 
             return new Point(x, y);
         }
+
+
+        public void SetMaxTargetScore()
+        {
+            var beadgroups = Beads.GroupBy(x=>x);
+            TargetScore = beadgroups.Select(x=>x.Count()/3*1000).Sum();
+        }
     }
 }
